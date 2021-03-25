@@ -27,6 +27,9 @@ include = (name, filename) ->
 
 
 api = {
+    __author__: "LeoDeveloper"
+    __version__: "0.1.0"
+
     extract_modules: =>
         -- not the nicest, but hey, it works!
         max = #@
