@@ -43,6 +43,7 @@ Output:
 package.preload["__luapack_entry__"] = function()
     print("hello world") -- test.lua
 end
+package.loaded["__luapack_entry__"] = nil
 return package.preload["__luapack_entry__"](...)
 ```
 
@@ -98,9 +99,11 @@ package.preload["__luapack_entry__"] = function()
     local print_ = require(name)
     print_("hello world") -- test.lua
 end
+package.loaded["__luapack_entry__"] = nil
 package.preload["dependency"] = function() -- added by packer:include
     return print
 end
+package.loaded["dependency"] = nil
 return package.preload["__luapack_entry__"](...)
 ```
 
@@ -140,6 +143,7 @@ Output:
 package.preload["dependency"] = function()
     return print
 end
+package.loaded["dependency"] = nil
 ```
 
 ## Full API
@@ -157,6 +161,7 @@ All options:
 - `minify = true` minifies the output
 - `package_polyfill = false` add polyfill for require and package
 - `with_header = true` adds the luapack header to the output
+- `clear_loaded = true` clears `package.loaded`
 
 
 **luapack:searchpath(name)**

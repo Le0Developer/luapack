@@ -42,6 +42,7 @@ export __version__ = "0.2.0"
 --   minify = true
 --   package_polyfill = false
 --   with_header = true
+--   clear_loaded = true
 export class Packer
     new: (@options = {}) =>
         @loaded = {}
@@ -127,6 +128,8 @@ export class Packer
                 writer\endwrap ->
                     writer\writelines content
                 already_loaded[content] = package_name
+            if @options.clear_loaded != false
+                writer\writeln "package.loaded[%q] = nil"\format package_name
         
         if @loaded["__luapack_entry__"]?
             -- some C functions may return "fake" nil which behave differently
