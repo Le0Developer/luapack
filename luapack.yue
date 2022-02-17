@@ -1,0 +1,151 @@
+
+require_pattern = [[require *%(?["']([^"']+)["']%)?]]
+minifier = pcall require, "lib/minifier"
+
+-- helpers
+fast_push = (tbl, item) ->
+    tbl[tbl.n + 1] = item
+    tbl.n += 1
+
+class Writer
+    new: =>
+        @dept = 0
+        @out = {n: 0}
+    
+    indent: => "\t"\rep @dept
+
+    writeln: (text) => fast_push @out, "#{@indent!}#{text}"
+    writelines: (text) => @writeln line for line in text\gmatch "[^\n]+"
+    
+    incr: => @dept += 1
+    decr: => @dept -= 1
+    wrap: (cb) =>
+        @incr!
+        cb!
+        @decr!
+    endwrap: (cb) =>
+        @wrap cb
+        @writeln "end"
+
+    str: => table.concat @out, "\n"
+
+-- version info
+
+export __author__ = "Leo Developer"
+export __url__ = "https://github.com/le0developer/luapack"
+export __license__ = "MIT"
+export __version__ = "0.2.0"
+
+-- packer class
+
+-- options:
+--   minify = true
+--   package_polyfill = false
+--   with_header = true
+export class Packer
+    new: (@options = {}) =>
+        @loaded = {}
+    
+    searchpath: (name) =>
+        package.searchpath name, package.path if package.searchpath -- lua 5.2+
+        sep = ";" -- lua 5.1 didnt have package.config
+        name = name\gsub "%.", "/" -- a.b.c -> a/b/c
+        for path in package.path\gmatch "[^;]+"
+            path = path\gsub "?", name
+            -- very janky cross platform check to see if the file exists
+            -- this janky check also somehow accepts directories
+            -- because they can be opened??
+            fh = io.open path, "r"
+            if fh?
+                fh\close!
+                return path
+
+    extract_packages: (source) =>
+        matches = {n: 0}
+        fast_push matches, match for match in source\gmatch require_pattern
+        matches
+
+    include: (package_name, filename) =>
+        filename = @searchpath filename unless filename?
+        print "include", package_name, filename
+        return if @loaded[package_name]? -- recursion
+        return unless filename\match"%.lua$" -- not a lua file
+        with fh = io.open filename, "r"
+            error "file not found: #{filename}" unless fh?
+            @loaded[package_name] = \read"*a"
+            \close!
+        return if "-- luapacked" == @loaded[package_name]\sub 1, 12
+        @include dependency, @searchpath dependency for dependency in *@extract_packages @loaded[package_name]
+
+    pack: (entry) =>
+        @include "__luapack_entry__", entry
+        error "file not found: #{entry}" unless @loaded["__luapack_entry__"]?
+
+        packed = @bootstrap!
+        packed = minifier.Rebuild.MinifyString packed if @options.minify != false and minifier
+        header = ""
+        if @options.with_header != false
+            header = "-- luapacked using #{__version__}"
+            if @options.minify != false and minifier
+                header ..= " + minify"
+            if @options.package_polyfill
+                header ..= " + package polyfill"
+            header ..= "\n"
+        header .. packed
+
+    bootstrap: =>
+        writer = Writer!
+        if @options.package_polyfill
+            writer\writeln "if not package then _G.package = {preload = {}, loaded = {}} end"
+            writer\writeln "if not package.preload then package.preload = {} end"
+            writer\writeln "if not package.loaded then package.loaded = {} end"
+            writer\writeln "if not require then"
+            writer\endwrap ->
+                writer\writeln "local sentinel = {}" -- recursion detection
+                writer\writeln "_G.require = function(modname)"
+                writer\endwrap ->
+                    writer\writeln "if package.loaded[modname] == sentinel then"
+                    writer\endwrap ->
+                        writer\writeln 'error(("loop or previous error loading module %q"):format(modname), 0)'
+                    writer\writeln "if package.loaded[modname] ~= nil then return package.loaded[name] end"
+                    writer\writeln "if not package.preload[modname] then"
+                    writer\endwrap ->
+                        writer\writeln 'error(("module not found %q"):format(modname), 2)'
+                    writer\writeln "package.loaded[modname] = sentinel"
+                    writer\writeln "local result = package.preload[modname]()"
+                    writer\writeln "if result == nil then result = true end"
+                    writer\writeln "package.loaded[modname] = result"
+                    writer\writeln "return result"
+
+        already_loaded = {}
+        for package_name, content in pairs @loaded
+            if already_loaded[content]
+                writer\writeln "package.preload[%q] = package.preload[%q]"\format package_name, already_loaded[content]
+            else
+                writer\writeln "package.preload[%q] = function(...)"\format package_name
+                writer\endwrap ->
+                    writer\writelines content
+                already_loaded[content] = package_name
+        
+        if @loaded["__luapack_entry__"]?
+            writer\writeln 'return package.preload["__luapack_entry__"](...)'
+        writer\str!
+
+-- cli
+arguments = {...}
+arguments.n = #arguments
+
+-- "clever" cli detection
+if arguments.n > 0 and not package.loaded[arguments[1]]? and not package.preload[arguments[1]]?
+    -- user is using cli!
+    print "Using luapack #{__version__}"
+    print!
+    for filename in *arguments
+        print "Packing #{filename}"
+        packer = Packer!
+        packed = packer\pack filename
+        outfile = filename\gsub("%.lua$", ".packed.lua")
+        print "Packed into #{outfile}"
+        with io.open outfile, "w"
+            \write packed
+            \close!

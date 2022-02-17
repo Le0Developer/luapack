@@ -19,8 +19,15 @@ jobs:
     - uses: leafo/gh-actions-luarocks@v4.0.0
     - name: install dependencies
       run: |
-        luarocks install alfons
-        luarocks install moonscript
+        luarocks install yuescript
 
-    - name: test
-      run: alfons test
+    - name: build
+      run: |
+        yue luapack.yue
+        lua luapack.lua luapack.lua
+    
+    - name: release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          luapack.packed.lua
