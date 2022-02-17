@@ -3,7 +3,7 @@ name: deploy
 on: [push]
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
     strategy:
       matrix:
