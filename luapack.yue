@@ -68,6 +68,7 @@ export class Packer
     include: (package_name, filename) =>
         filename = @searchpath filename unless filename?
         print "include", package_name, filename
+        return unless filename?
         return if @loaded[package_name]? -- recursion
         return unless filename\match"%.lua$" -- not a lua file
         with fh = io.open filename, "r"
@@ -75,7 +76,7 @@ export class Packer
             @loaded[package_name] = \read"*a"
             \close!
         return if "-- luapacked" == @loaded[package_name]\sub 1, 12
-        @include dependency, @searchpath dependency for dependency in *@extract_packages @loaded[package_name]
+        @include dependency for dependency in *@extract_packages @loaded[package_name]
 
     pack: (entry) =>
         @include "__luapack_entry__", entry
