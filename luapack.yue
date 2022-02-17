@@ -138,11 +138,23 @@ arguments.n = #arguments
 -- "clever" cli detection
 if arguments.n > 0 and not package.loaded[arguments[1]]? and not package.preload[arguments[1]]?
     -- user is using cli!
+    options = {}
+    for arg in *arguments
+        continue if "-" != arg\sub 1, 1
+        switch arg
+            when "-no-header" then options.with_header = false
+            when "-yes-header" then options.with_header = true
+            when "-no-package-polyfill" then options.package_polyfill = false
+            when "-yes-package-polyfill" then options.package_polyfill = true
+            when "-no-minify" then options.minify = false
+            when "-yes-minify" then options.minify = true
+
     print "Using luapack #{__version__}"
     print!
     for filename in *arguments
+        continue if "-" == filename\sub 1, 1
         print "Packing #{filename}"
-        packer = Packer!
+        packer = Packer options
         packed = packer\pack filename
         outfile = filename\gsub("%.lua$", ".packed.lua")
         print "Packed into #{outfile}"
