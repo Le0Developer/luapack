@@ -66,7 +66,7 @@ export class Packer
         matches
 
     include: (package_name, filename) =>
-        filename = @searchpath filename unless filename?
+        filename = @searchpath package_name unless filename?
         print "include", package_name, filename
         return unless filename?
         return if @loaded[package_name]? -- recursion
