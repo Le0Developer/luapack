@@ -29,5 +29,5 @@ jobs:
     - name: release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
-      with:
+      with: |
         luapack.packed.lua
