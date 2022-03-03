@@ -1,0 +1,35 @@
+name: deploy
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+
+    - uses: leafo/gh-actions-lua@v8.0.0
+      with:
+        luaVersion: 5.4.4
+
+    - uses: actions/setup-node@master
+    - uses: actions/checkout@master
+      with:
+        repository: "leodev-xyz/yuescript-wasm"
+        path: "yuescript-wasm"
+
+    - name: build
+      run: |
+        node yuescript-wasm/cli.js luapack.yue
+        lua luapack.lua luapack.lua
+    
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
+        files: |
+          luapack.packed.lua

@@ -1,0 +1,31 @@
+name: test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lua-version: ["5.1.5", "5.2.4", "5.3.6", "5.4.4"]
+
+    steps:
+    - uses: actions/checkout@master
+
+    - uses: leafo/gh-actions-lua@v8.0.0
+      with:
+        luaVersion: ${{ matrix.lua-version }}
+
+    - uses: actions/setup-node@master
+    - uses: actions/checkout@master
+      with:
+        repository: "leodev-xyz/yuescript-wasm"
+        path: "yuescript-wasm"
+
+    - name: build
+      run: |
+        node yuescript-wasm/cli.js luapack.yue
+        lua luapack.lua luapack.lua
+        lua luapack.packed.lua luapack.lua
+        rm -rf lib
+        lua luapack.packed.lua luapack.lua
