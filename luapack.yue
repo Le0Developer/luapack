@@ -87,12 +87,7 @@ export class Packer
         packed = minifier.Rebuild.MinifyString packed if @options.minify != false and minifier
         header = ""
         if @options.with_header != false
-            header = "-- luapacked using #{__version__}"
-            if @options.minify != false and minifier
-                header ..= " + minify"
-            if @options.package_polyfill
-                header ..= " + package polyfill"
-            header ..= "\n"
+            header = "-- luapacked using #{__version__}\n"
         header .. packed
 
     bootstrap: =>
