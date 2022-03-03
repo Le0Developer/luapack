@@ -29,6 +29,6 @@ jobs:
     
     - name: release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
+      if: startsWith(github.ref, 'refs/tags/') && matrix.lua-version == "5.4.4"
       with:
         files: luapack.packed.lua
