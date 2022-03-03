@@ -1,6 +1,6 @@
 
 require_pattern = [[require *%(?["']([^"']+)["']%)?]]
-minifier = select 2, pcall -> require "lib/minifier"
+minifier = try -> require "lib/minifier"
 
 -- helpers
 fast_push = (tbl, item) ->
