@@ -44,7 +44,9 @@ package.preload["__luapack_entry__"] = function()
     print("hello world") -- test.lua
 end
 package.loaded["__luapack_entry__"] = nil
-return package.preload["__luapack_entry__"](...)
+do
+    local _result = package.preload["__luapack_entry__"](...)
+    return _result
 ```
 
 ## Static require's
@@ -104,7 +106,9 @@ package.preload["dependency"] = function() -- added by packer:include
     return print
 end
 package.loaded["dependency"] = nil
-return package.preload["__luapack_entry__"](...)
+do
+    local _result = package.preload["__luapack_entry__"](...)
+    return _result
 ```
 
 Using `package_polyfill` option to polyfill the require function and the package table for enviroments that don't support it:
