@@ -8,13 +8,13 @@ Pack a lua file with many `require`d dependencies into a standalone lua!
 
 Head to [releases](https://github.com/Le0Developer/luapack/releases) and get the latest `luapack.packed.lua`.
 
-Or compile from source:
+### Installation from source
 
 Install [yuescript](http://yuescript.org): `luarocks install yuescript`
 
-And then run `yue luapack.lua`.
+And then run `yue -e luapack.yue luapack.yue`.
 
-Luapack luapack for a standalone version (with minifier): `lua luapack.lua luapack.lua`
+You can use `luapack.luapacked.lua` afterwards.
 
 ## Usage
 
@@ -192,5 +192,3 @@ This **does not** minify it or add the luapack header.
 
 This lua uses modified versions in `lib` directory of
 - [SquidDev's lua minifier](https://github.com/SquidDev-CC/Howl/tree/master/howl/lexer)
-
-
