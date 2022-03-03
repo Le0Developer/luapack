@@ -135,6 +135,7 @@ export class Packer
             -- some C functions may return "fake" nil which behave differently
             -- returning it crashes some environments
             -- assigning it to a variable fixes the issue
+            --  TODO: do we need the `do` block?
             writer\writeln "do"
             writer\endwrap ->
                 writer\writeln 'local _result = package.preload["__luapack_entry__"](...)'
