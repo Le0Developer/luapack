@@ -17,14 +17,15 @@ jobs:
         luaVersion: ${{ matrix.lua-version }}
         luaCompileFlags: LUA_CFLAGS="-fPIC"
 
-    - uses: leafo/gh-actions-luarocks@v4.0.0
-    - name: install dependencies
-      run: |
-        luarocks install yuescript
+    - uses: actions/setup-node@master
+    - uses: actions/checkout@master
+      with:
+        repository: "leodev-xyz/yuescript-wasm"
+        path: "yuescript-wasm"
 
     - name: build
       run: |
-        yue luapack.yue
+        node yuescript-wasm/cli.js luapack.yue
         lua luapack.lua luapack.lua
     
     - name: release
