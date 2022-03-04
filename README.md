@@ -170,7 +170,7 @@ All options:
 - `minify = true` minifies the output
 - `package_polyfill = false` add polyfill for require and package
 - `with_header = true` adds the luapack header to the output
-- `clear_loaded = true` clears `package.loaded`
+- `clear_loaded = true` clears `package.loaded` cache
 - `plugins = default_plugins` plugins
 - `compat_arg = true` compatibility for arg (cmd line arguments) passing in lua5.1 and 5.2
 
