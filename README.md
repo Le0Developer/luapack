@@ -83,7 +83,7 @@ Or use the `packer:include` api.
 
 ## Using the API
 
-Using `packer:include`:
+- Using `packer:include`:
 
 ```lua
 local packer = luapack.Packer()
@@ -111,7 +111,7 @@ do
     return _result
 ```
 
-Using `package_polyfill` option to polyfill the require function and the package table for enviroments that don't support it:
+- Using `package_polyfill` option to polyfill the require function and the package table for enviroments that don't support it:
 
 ```lua
 -- package_polyfill to create package and require
@@ -120,6 +120,8 @@ local packer = luapack.Packer({package_polyfill = true})
 local packed = packer:pack("test.lua")
 print(packed)
 ```
+
+Or use the `-yes-package-polyfill` CLI option.
 
 Output:
 ```lua
@@ -131,7 +133,7 @@ end
 ...
 ```
 
-Using `packer:bootstrap` without entry script:
+- Using `packer:bootstrap` without entry script:
 
 ```lua
 local packer = luapack.Packer()
@@ -170,26 +172,26 @@ All options:
 - `plugins = default_plugins` plugins
 
 
-**luapack:searchpath_compat(name)**
+- **luapack:searchpath_compat(name)**
 
 Uses `package.searchpath` (Lua 5.2+).
 If `package.searchpath` does not exist, a janky search using `io.open` is done as fallback. (for Lua 5.1 support)
 
-**luapack:extract_packages(source)**
+- **luapack:extract_packages(source)**
 
 Extracts all `require` calls found in the source.
 
-**luapack:include(package_name, filename=nil)**
+- **luapack:include(package_name, filename=nil)**
 
 Includes the package and its dependencies.
 
-**luapack:pack(entry)**
+- **luapack:pack(entry)**
 
 Includes the file as entry.
 
 Minifies and adds the luapack header.
 
-**luapack:bootstrap()**
+- **luapack:bootstrap()**
 
 Generates the script and returns it.
 This **does not** minify it or add the luapack header.
