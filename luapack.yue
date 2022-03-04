@@ -176,7 +176,7 @@ export class Packer
                     writer\endwrap ->
                         writer\writeln 'error(("module not found %q"):format(modname), 2)'
                     writer\writeln "package.loaded[modname] = sentinel"
-                    writer\writeln "local result = package.preload[modname]()"
+                    writer\writeln 'local result = package.preload[modname](modname, ":preload:")'
                     writer\writeln "if result == nil then result = true end"
                     writer\writeln "package.loaded[modname] = result"
                     writer\writeln "return result"

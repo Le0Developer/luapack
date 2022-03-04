@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- require of package polyfill now calls the preload function with correct arguments
+
 ## [0.3.0] - 2022-02-04
 
 ### Added
