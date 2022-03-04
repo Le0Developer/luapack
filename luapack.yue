@@ -209,7 +209,7 @@ arguments = {...}
 arguments.n = #arguments
 
 -- "clever" cli detection
-if arguments.n > 0 and not package.loaded[arguments[1]]? and not package.preload[arguments[1]]?
+if arguments.n > 0 and not package.preload[arguments[1]]? and not package.preload["__luapack_entry__"]?
     -- user is using cli!
     options = {}
     for arg in *arguments
