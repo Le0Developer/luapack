@@ -157,6 +157,7 @@ package.loaded["dependency"] = nil
 - `luapack.__license__` string
 - `luapack.__version__` string
 - `luapack.Packer` class
+- `luapack.default_plugins` array
 
 ### luapack.Packer
 
@@ -166,9 +167,10 @@ All options:
 - `package_polyfill = false` add polyfill for require and package
 - `with_header = true` adds the luapack header to the output
 - `clear_loaded = true` clears `package.loaded`
+- `plugins = default_plugins` plugins
 
 
-**luapack:searchpath(name)**
+**luapack:searchpath_compat(name)**
 
 Uses `package.searchpath` (Lua 5.2+).
 If `package.searchpath` does not exist, a janky search using `io.open` is done as fallback. (for Lua 5.1 support)
@@ -191,6 +193,49 @@ Minifies and adds the luapack header.
 
 Generates the script and returns it.
 This **does not** minify it or add the luapack header.
+
+## Plugins
+
+luapack supports plugins to allow more formats than just Lua or
+discovery of packages in different places.
+
+### default_plugins
+
+- lua
+
+This plugin allows discovery of lua packages that are on `package.path`.
+
+- yue
+
+This plugin allows discovery and importment of `.yue` files. (requires `yue` package)
+
+- moonscript
+
+This plugin allows discovery and importment of `.moon` files. (requires `moonscript` package)
+
+
+### Plugin API
+
+A plugin is just a table:
+
+- `name`: string
+
+Not used but recommended.
+
+- `check_filename`(`packer`: Packer, `filename`: string) -> `bool` (optional)
+
+A function that returns a truthy value if the filename suggests that the file should be handled by this plugin.
+This is used the luapack entry script (eg when using the cli `lua luapack.lua main.yue`).
+
+- `searchpath`(`packer`: Packer, `name`: string) -> `?string` (optional)
+
+A function that searches for the package and returns its path.
+
+- `loader`(`packer`: Packer, `name`: string, `content`: string) -> `string` (optional)
+
+A function that returns the modified content of the file.
+This is for post-processing or compilation of eg yuescript code.
+
 
 ## Acknowledgements
 
