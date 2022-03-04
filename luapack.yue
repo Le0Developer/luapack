@@ -108,6 +108,7 @@ if "table" == type moon
 --   with_header = true
 --   clear_loaded = true
 --   plugins = default_plugins
+--   compat_arg = true
 export class Packer
     new: (@options = {}) =>
         @loaded = {}
@@ -159,6 +160,9 @@ export class Packer
 
     bootstrap: =>
         writer = Writer!
+        if @options.compat_arg != false
+            writer\writeln "local __luapack_arg__ = arg"
+
         if @options.package_polyfill
             writer\writeln "if not package then _G.package = {preload = {}, loaded = {}} end"
             writer\writeln "if not package.preload then package.preload = {} end"
@@ -192,6 +196,8 @@ export class Packer
             else
                 writer\writeln "package.preload[%q] = function(...)"\format package_name
                 writer\endwrap ->
+                    if @options.compat_arg != false
+                        writer\writeln "local arg = __luapack_arg__"
                     writer\writelines content
                 already_loaded[content] = package_name
             if @options.clear_loaded != false

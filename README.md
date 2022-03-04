@@ -172,6 +172,7 @@ All options:
 - `with_header = true` adds the luapack header to the output
 - `clear_loaded = true` clears `package.loaded`
 - `plugins = default_plugins` plugins
+- `compat_arg = true` compatibility for arg (cmd line arguments) passing in lua5.1 and 5.2
 
 
 - **luapack:searchpath_compat(name)**
