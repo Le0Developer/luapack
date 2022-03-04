@@ -226,19 +226,48 @@ A plugin is just a table:
 
 Not used but recommended.
 
-- `check_filename`(`packer`: Packer, `filename`: string) -> `bool` (optional)
-
-A function that returns a truthy value if the filename suggests that the file should be handled by this plugin.
-This is used the luapack entry script (eg when using the cli `lua luapack.lua main.yue`).
-
 - `searchpath`(`packer`: Packer, `name`: string) -> `?string` (optional)
 
 A function that searches for the package and returns its path.
 
-- `loader`(`packer`: Packer, `name`: string, `content`: string) -> `string` (optional)
+- `loader`(`packer`: Packer, `name`: string, `filename`: string, `content`: string) -> `?string`, `?string` (optional)
 
-A function that returns the modified content of the file.
+A function that returns the modified content of the file and a new filename (both can be falsy).
 This is for post-processing or compilation of eg yuescript code.
+
+### Example plugin
+
+```lua
+local luapack = require("luapack")
+
+luapack.helpers.fast_push(luapack.default_plugins, {
+    name = "Add comment",
+    loader = function(packer, name, filename, content)
+        if not luapack.helpers.check_file_extension(filename, ".lua") then
+            return false -- dont do any changes if its not a lua file
+        end
+        -- name and filename as comment at the start
+        return "-- " .. name .. " at " .. filename .. "\n" .. content
+    end
+})
+
+local packer = luapack.Packer()
+local packed = packer:pack("test.lua")
+print(packed)
+```
+
+Output:
+```lua
+package.preload["__luapack_entry__"] = function(...)
+	-- __luapack_entry__ at test.lua
+	print("hello world")
+end
+package.loaded["__luapack_entry__"] = nil
+do
+	local _result = package.preload["__luapack_entry__"](...)
+	return _result
+end
+```
 
 
 ## Acknowledgements
