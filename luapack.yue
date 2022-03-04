@@ -81,7 +81,7 @@ fast_push default_plugins,
     name: "lua"
     searchpath: (packer, name) -> searchpath_compat name, package.path
 
-if yue
+if "table" == type yue
     fast_push default_plugins,
         name: "yuescript"
         searchpath: (packer, name) -> searchpath_compat name, package_path_with_different_extension "yue"
@@ -90,7 +90,7 @@ if yue
             lua = yue.to_lua content, reserve_line_number: false
             lua, replace_file_extension filename, ".yue", ".lua"
 
-if moon
+if "table" == type moon
     fast_push default_plugins,
         name: "moonscript"
         searchpath: (packer, name) -> searchpath_compat name, package_path_with_different_extension "moon"
@@ -151,7 +151,7 @@ export class Packer
         error "file not found: #{entry}" unless @loaded["__luapack_entry__"]?
 
         packed = @bootstrap!
-        packed = minifier.Rebuild.MinifyString packed if @options.minify != false and minifier
+        packed = minifier.Rebuild.MinifyString packed if @options.minify != false and "table" == type minifier
         header = ""
         if @options.with_header != false
             header = "-- luapacked using #{__version__}\n"
@@ -205,12 +205,7 @@ export class Packer
         writer\str!
 
 -- cli
-arguments = {...}
-arguments.n = #arguments
-
--- "clever" cli detection
-if arguments.n > 0 and arguments[2] != ":preload:" and not package.loaded[arguments[1]]?
-    -- user is using cli!
+cli = (arguments) ->
     options = {}
     for arg in *arguments
         continue if "-" != arg\sub 1, 1
@@ -235,3 +230,21 @@ if arguments.n > 0 and arguments[2] != ":preload:" and not package.loaded[argume
         with io.open outfile, "w"
             \write packed
             \close!
+
+
+check_cli = =>
+    return if @n == 0
+    return if @[2] == ":preload:" -- package.preload (luapacked)
+    return unless arg? -- support for cli args
+
+    -- check if they match
+    for i = 1, @n
+        return if arg[i] != @[i] -- dont match
+    
+    true
+
+
+arguments = {...}
+arguments.n = #arguments
+
+cli arguments if check_cli arguments

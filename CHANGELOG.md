@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - require of package polyfill now calls the preload function with correct arguments
 
+### Fixed
+
+- Fixed CLI (finally)
+- Fixed optional dependecies not being optional
+
 ## [0.3.0] - 2022-02-04
 
 ### Added
