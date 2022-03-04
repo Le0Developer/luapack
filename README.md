@@ -47,6 +47,7 @@ package.loaded["__luapack_entry__"] = nil
 do
     local _result = package.preload["__luapack_entry__"](...)
     return _result
+end
 ```
 
 ## Static require's
@@ -109,6 +110,7 @@ package.loaded["dependency"] = nil
 do
     local _result = package.preload["__luapack_entry__"](...)
     return _result
+end
 ```
 
 - Using `package_polyfill` option to polyfill the require function and the package table for enviroments that don't support it:
