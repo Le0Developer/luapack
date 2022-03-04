@@ -25,11 +25,16 @@ jobs:
     - name: build
       run: |
         node yuescript-wasm/cli.js luapack.yue
+        mkdir dist
         lua luapack.lua luapack.lua
+        mv luapack.packed.lua dist/luapack.lua
+        rm -rf lib
+        lua luapack.lua luapack.lua
+        mv luapack.packed.lua dist/luapack-no-minify.lua
     
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
         files: |
-          luapack.packed.lua
+          dist/*.lua

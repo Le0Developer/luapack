@@ -6,7 +6,7 @@ Pack a lua file with many `require`d dependencies into a standalone lua!
 
 ## Installation
 
-Head to [releases](https://github.com/Le0Developer/luapack/releases) and get the latest `luapack.packed.lua`.
+Head to [releases](https://github.com/Le0Developer/luapack/releases) and get the latest `luapack.lua`.
 
 ### Installation from source
 
