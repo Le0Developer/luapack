@@ -35,6 +35,32 @@ class Writer
 
     str: => table.concat @out, "\n"
 
+
+searchpath_compat = (name, path) ->
+    package.searchpath name, path if package.searchpath -- lua 5.2+
+    sep = ";" -- lua 5.1 didnt have package.config
+    name = name\gsub "%.", "/" -- a.b.c -> a/b/c
+    for path in path\gmatch "[^;]+"
+        path = path\gsub "?", name
+        -- very janky cross platform check to see if the file exists
+        -- this janky check also somehow accepts directories
+        -- because they can be opened??
+        fh = io.open path, "r"
+        if fh?
+            fh\close!
+            return path
+
+package_path_with_different_extension = => package.path\gsub "%.lua", ".#{@}"
+-- basically string:endswith
+check_file_extension = (filename, ext) -> ext == filename\sub -#ext
+replace_file_extension = (from_, to) => @gsub "%#{from_}$", to
+
+export helpers = {
+    :fast_push
+    :searchpath_compat
+    :package_path_with_different_extension
+    :check_file_extension
+}
 -- version info
 
 export __author__ = "Leo Developer"
@@ -51,27 +77,27 @@ export default_plugins = {n: 0}
 --     post-processing of the file
 --     return lua code
 
-package_path_with_different_extension = => package.path\gsub "%.lua", ".#{@}"
-check_file_extension = (filename, ext) -> ext == filename\sub -#ext
-
 fast_push default_plugins,
     name: "lua"
-    check_filename: (packer, filename) -> check_file_extension filename, ".lua"
-    searchpath: (packer, name) -> packer\searchpath_compat name, package.path
+    searchpath: (packer, name) -> searchpath_compat name, package.path
 
 if yue
     fast_push default_plugins,
         name: "yuescript"
-        check_filename: (packer, filename) -> check_file_extension filename, ".yue"
-        searchpath: (packer, name) -> packer\searchpath_compat name, package_path_with_different_extension "yue"
-        loader: (packer, name, content) -> yue.to_lua content, reserve_line_number: false
+        searchpath: (packer, name) -> searchpath_compat name, package_path_with_different_extension "yue"
+        loader: (packer, name, filename, content) ->
+            return false unless check_file_extension filename, ".yue"
+            lua = yue.to_lua content, reserve_line_number: false
+            lua, replace_file_extension filename, ".yue", ".lua"
 
 if moon
     fast_push default_plugins,
         name: "moonscript"
-        check_filename: (packer, filename) -> check_file_extension filename, ".moon"
-        searchpath: (packer, name) -> packer\searchpath_compat name, package_path_with_different_extension "moon"
-        loader: (packer, name, content) -> moon.to_lua content
+        searchpath: (packer, name) -> searchpath_compat name, package_path_with_different_extension "moon"
+        loader: (packer, name, filename, content) ->
+            return false unless check_file_extension filename, ".moon"
+            lua = moon.to_lua content
+            lua, replace_file_extension filename, ".moon", ".lua"
 
 
 -- packer class
@@ -85,20 +111,6 @@ if moon
 export class Packer
     new: (@options = {}) =>
         @loaded = {}
-    
-    searchpath_compat: (name, path) =>
-        package.searchpath name, path if package.searchpath -- lua 5.2+
-        sep = ";" -- lua 5.1 didnt have package.config
-        name = name\gsub "%.", "/" -- a.b.c -> a/b/c
-        for path in path\gmatch "[^;]+"
-            path = path\gsub "?", name
-            -- very janky cross platform check to see if the file exists
-            -- this janky check also somehow accepts directories
-            -- because they can be opened??
-            fh = io.open path, "r"
-            if fh?
-                fh\close!
-                return path
 
     extract_packages: (source) =>
         matches = {n: 0}
@@ -108,16 +120,6 @@ export class Packer
     include: (package_name, filename) =>
         plugins = @options.plugins or default_plugins
         plugin_index = 1
-        if filename?
-            -- only the case for __luapack_entry__ or other manual files
-            -- but we need to figure out the plugin
-            while true
-                plugin = plugins[plugin_index]
-                return unless plugin? -- all plugins failed
-                if plugin.check_filename?
-                    break if plugin.check_filename @, filename -- found the responsible plugin
-                plugin_index += 1
-
         while not filename?
             plugin = plugins[plugin_index]
             return unless plugin? -- all plugins failed
@@ -125,17 +127,23 @@ export class Packer
                 filename = plugin.searchpath @, package_name
                 break if filename? -- finally found the filename
             plugin_index += 1
-        
-        return unless filename?
+
         return if @loaded[package_name]? -- recursion
         -- return unless filename\match"%.lua$" -- not a lua file
         with fh = io.open filename, "r"
             error "file not found: #{filename}" unless fh?
             @loaded[package_name] = \read"*a"
             \close!
+
+        -- post process
+        for plugin in *plugins
+            continue unless plugin.loader?
+            new_content, new_filename = plugin.loader @, package_name, filename, @loaded[package_name]
+            @loaded[package_name] = new_content if new_content
+            filename = filename if new_filename
+
         return if "-- luapacked" == @loaded[package_name]\sub 1, 12 -- dont pack dependencies of a packed file
-        if plugins[plugin_index].loader
-            @loaded[package_name] = plugins[plugin_index].loader @, package_name, @loaded[package_name]
+
         @include dependency for dependency in *@extract_packages @loaded[package_name]
 
     pack: (entry) =>

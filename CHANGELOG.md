@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `helper`: `searchpath_compat`, `package_path_with_different_extension`, `check_file_extension`, `fast_push`
+
+### Changed
+
+- Moved `packer:searchpath_compat` to `helper.searchpath_compat`
+- Changed plugin logic for `loader`
+
+### Removed
+
+- Removed `plugin.check_filename`
+
 ## [0.2.0] - 2022-02-03
 
 ### Added
