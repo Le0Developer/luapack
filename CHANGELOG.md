@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed polyfill require not resetting recursion detection when an error occurs
+- Fixed polyfill require not returning `":preload:"`
+
 ## [0.3.1] - 2022-02-04
 
 ### Added
