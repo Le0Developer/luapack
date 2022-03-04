@@ -97,13 +97,13 @@ print(packed)
 
 Output:
 ```lua
-package.preload["__luapack_entry__"] = function()
+package.preload["__luapack_entry__"] = function(...)
     local name = "dependency" -- dynamic require
     local print_ = require(name)
     print_("hello world") -- test.lua
 end
 package.loaded["__luapack_entry__"] = nil
-package.preload["dependency"] = function() -- added by packer:include
+package.preload["dependency"] = function(...) -- added by packer:include
     return print
 end
 package.loaded["dependency"] = nil
@@ -148,7 +148,7 @@ print(packed) -- only has the package.preload sets
 
 Output:
 ```lua
-package.preload["dependency"] = function()
+package.preload["dependency"] = function(...)
     return print
 end
 package.loaded["dependency"] = nil
