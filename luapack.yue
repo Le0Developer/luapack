@@ -161,7 +161,10 @@ export class Packer
     bootstrap: =>
         writer = Writer!
         if @options.compat_arg != false
-            writer\writeln "local __luapack_arg__ = arg"
+            for package_name, content in pairs @loaded
+                continue unless content\match "%.%.%."
+                writer\writeln "local __luapack_arg__ = arg"
+                break
 
         if @options.package_polyfill
             writer\writeln "if not package then _G.package = {preload = {}, loaded = {}} end"
@@ -196,7 +199,7 @@ export class Packer
             else
                 writer\writeln "package.preload[%q] = function(...)"\format package_name
                 writer\endwrap ->
-                    if @options.compat_arg != false
+                    if @options.compat_arg != false and content\match "%.%.%."
                         writer\writeln "local arg = __luapack_arg__"
                     writer\writelines content
                 already_loaded[content] = package_name
