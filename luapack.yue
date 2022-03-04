@@ -162,9 +162,9 @@ export class Packer
         writer = Writer!
         if @options.compat_arg != false
             for package_name, content in pairs @loaded
-                continue unless content\match "%.%.%."
-                writer\writeln "local __luapack_arg__ = arg"
-                break
+                if content\match "%.%.%."
+                    writer\writeln "local __luapack_arg__ = arg"
+                    break
 
         if @options.package_polyfill
             writer\writeln "if not package then _G.package = {preload = {}, loaded = {}} end"
