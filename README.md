@@ -212,16 +212,16 @@ This plugin allows discovery of lua packages that are on `package.path`.
 
 - yue
 
-This plugin allows discovery and importment of `.yue` files. (requires `yue` package)
+This plugin allows discovery and usage of `.yue` files. (requires `yue` to be installed)
 
 - moonscript
 
-This plugin allows discovery and importment of `.moon` files. (requires `moonscript` package)
+This plugin allows discovery and usage of `.moon` files. (requires `moonscript` to be installed)
 
 
 ### Plugin API
 
-A plugin is just a table:
+A plugin is just a table with the following fields:
 
 - `name`: string
 
@@ -247,7 +247,7 @@ luapack.helpers.fast_push(luapack.default_plugins, {
         if not luapack.helpers.check_file_extension(filename, ".lua") then
             return false -- dont do any changes if its not a lua file
         end
-        -- name and filename as comment at the start
+        -- add package name and filename as comment at the start
         return "-- " .. name .. " at " .. filename .. "\n" .. content
     end
 })
