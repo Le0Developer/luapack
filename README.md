@@ -50,7 +50,7 @@ do
 end
 ```
 
-## Static require's
+## How does it work?
 
 Luapack extracts all `require` calls statically using a lua pattern, so if you require a dependency dynamically it won't be included.
 

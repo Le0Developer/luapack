@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added `compat_arg` option which is enabled by default (compatibility option for arg in lua 5.1/5.2)
+- Added `compat_arg` option which is enabled by default (compatibility option for `arg` in lua 5.1/5.2)
 
 ## [0.3.2] - 2022-02-04
 
