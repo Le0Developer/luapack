@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3] - 2022-02-06
+
 ### Added
 
 - Added `compat_arg` option which is enabled by default (compatibility option for `arg` in lua 5.1/5.2)
@@ -68,7 +70,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial release
 
 
-[Unreleased]: https://github.com/le0developer/luapack/compare/v0.3.2...HEAD
+[Unreleased]: https://github.com/le0developer/luapack/compare/v0.3.3...HEAD
+[0.3.3]: https://github.com/le0developer/luapack/releases/tag/v0.3.3
 [0.3.2]: https://github.com/le0developer/luapack/releases/tag/v0.3.2
 [0.3.1]: https://github.com/le0developer/luapack/releases/tag/v0.3.1
 [0.3.0]: https://github.com/le0developer/luapack/releases/tag/v0.3.0
