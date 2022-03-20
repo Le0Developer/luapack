@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Updated
+
+- Updated lua pattern:
+    - Support `require("someone's lib")`
+    - Allow all whitespace between require and parentheses
+    - Allow whitespace within the parentheses too
+
 ## [0.3.3] - 2022-02-06
 
 ### Added

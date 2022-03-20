@@ -58,6 +58,8 @@ Luapack extracts all `require` calls statically using a lua pattern, so if you r
 require("test") -- works
 require "test" -- works
 require'test' -- works
+require("someone's lib") -- works
+require ( "test"      )  -- works
 require                     "test" -- works
 
 myrequire("test") -- also works!
