@@ -18,10 +18,10 @@ class Writer
         @dept = 0
         @out = {n: 0}
     
-    indent: => "\t"\rep @dept
+    indent: => "\t"::rep @dept
 
     writeln: (text) => fast_push @out, "#{@indent!}#{text}"
-    writelines: (text) => @writeln line for line in text\gmatch "[^\n]+"
+    writelines: (text) => @writeln line for line in text::gmatch "[^\n]+"
     
     incr: => @dept += 1
     decr: => @dept -= 1
@@ -39,20 +39,20 @@ class Writer
 searchpath_compat = (name, path) ->
     package.searchpath name, path if package.searchpath -- lua 5.2+
     sep = ";" -- lua 5.1 didnt have package.config
-    name = name\gsub "%.", "/" -- a.b.c -> a/b/c
-    for path in path\gmatch "[^;]+"
-        path = path\gsub "?", name
+    name = name::gsub "%.", "/" -- a.b.c -> a/b/c
+    for path in path::gmatch "[^;]+"
+        path = path::gsub "?", name
         -- very janky cross platform check to see if the file exists
         -- this janky check also somehow accepts directories
         -- because they can be opened??
         fh = io.open path, "r"
         if fh?
-            fh\close!
+            fh::close!
             return path
 
-package_path_with_different_extension = => package.path\gsub "%.lua", ".#{@}"
+package_path_with_different_extension = => package.path::gsub "%.lua", ".#{@}"
 -- basically string:endswith
-check_file_extension = (filename, ext) -> ext == filename\sub -#ext
+check_file_extension = (filename, ext) -> ext == filename::sub -#ext
 replace_file_extension = (from_, to) => @gsub "%#{from_}$", to
 
 export helpers = {
@@ -115,7 +115,7 @@ export class Packer
 
     extract_packages: (source) =>
         matches = {n: 0}
-        fast_push matches, match for match in source\gmatch require_pattern
+        fast_push matches, match for match in source::gmatch require_pattern
         matches
 
     include: (package_name, filename) =>
@@ -130,11 +130,11 @@ export class Packer
             plugin_index += 1
 
         return if @loaded[package_name]? -- recursion
-        -- return unless filename\match"%.lua$" -- not a lua file
+        -- return unless filename::match"%.lua$" -- not a lua file
         with fh = io.open filename, "r"
             error "file not found: #{filename}" unless fh?
-            @loaded[package_name] = \read"*a"
-            \close!
+            @loaded[package_name] = ::read"*a"
+            ::close!
 
         -- post process
         for plugin in *plugins
@@ -143,7 +143,7 @@ export class Packer
             @loaded[package_name] = new_content if new_content
             filename = filename if new_filename
 
-        return if "-- luapacked" == @loaded[package_name]\sub 1, 12 -- dont pack dependencies of a packed file
+        return if "-- luapacked" == @loaded[package_name]::sub 1, 12 -- dont pack dependencies of a packed file
 
         @include dependency for dependency in *@extract_packages @loaded[package_name]
 
@@ -162,66 +162,66 @@ export class Packer
         writer = Writer!
         if @options.compat_arg != false
             for package_name, content in pairs @loaded
-                if content\match "%.%.%."
-                    writer\writeln "local __luapack_arg__ = arg"
+                if content::match "%.%.%."
+                    writer::writeln "local __luapack_arg__ = arg"
                     break
 
         if @options.package_polyfill
-            writer\writeln "if not package then _G.package = {preload = {}, loaded = {}} end"
-            writer\writeln "if not package.preload then package.preload = {} end"
-            writer\writeln "if not package.loaded then package.loaded = {} end"
-            writer\writeln "if not require then"
-            writer\endwrap ->
-                writer\writeln "local sentinel = {}" -- recursion detection
-                writer\writeln "_G.require = function(modname)"
-                writer\endwrap ->
-                    writer\writeln "if package.loaded[modname] == sentinel then"
-                    writer\endwrap ->
-                        writer\writeln 'error(("loop or previous error loading module %q"):format(modname), 0)'
-                    writer\writeln "if package.loaded[modname] ~= nil then return package.loaded[name] end"
-                    writer\writeln "if not package.preload[modname] then"
-                    writer\endwrap ->
-                        writer\writeln 'error(("module not found %q"):format(modname), 2)'
-                    writer\writeln "package.loaded[modname] = sentinel"
-                    writer\writeln 'local success, result = pcall(package.preload[modname], modname, ":preload:")'
-                    writer\writeln "if not success then"
-                    writer\endwrap ->
-                        writer\writeln "package.loaded[modname] = nil" -- so it can be loaded again
-                        writer\writeln "error(result)" -- rethrow error
-                    writer\writeln "if result == nil then result = true end"
-                    writer\writeln "package.loaded[modname] = result"
-                    writer\writeln 'return result, ":preload:"'
+            writer::writeln "if not package then _G.package = {preload = {}, loaded = {}} end"
+            writer::writeln "if not package.preload then package.preload = {} end"
+            writer::writeln "if not package.loaded then package.loaded = {} end"
+            writer::writeln "if not require then"
+            writer::endwrap ->
+                writer::writeln "local sentinel = {}" -- recursion detection
+                writer::writeln "_G.require = function(modname)"
+                writer::endwrap ->
+                    writer::writeln "if package.loaded[modname] == sentinel then"
+                    writer::endwrap ->
+                        writer::writeln 'error(("loop or previous error loading module %q"):format(modname), 0)'
+                    writer::writeln "if package.loaded[modname] ~= nil then return package.loaded[name] end"
+                    writer::writeln "if not package.preload[modname] then"
+                    writer::endwrap ->
+                        writer::writeln 'error(("module not found %q"):format(modname), 2)'
+                    writer::writeln "package.loaded[modname] = sentinel"
+                    writer::writeln 'local success, result = pcall(package.preload[modname], modname, ":preload:")'
+                    writer::writeln "if not success then"
+                    writer::endwrap ->
+                        writer::writeln "package.loaded[modname] = nil" -- so it can be loaded again
+                        writer::writeln "error(result)" -- rethrow error
+                    writer::writeln "if result == nil then result = true end"
+                    writer::writeln "package.loaded[modname] = result"
+                    writer::writeln 'return result, ":preload:"'
 
         already_loaded = {}
         for package_name, content in pairs @loaded
             if already_loaded[content]
-                writer\writeln "package.preload[%q] = package.preload[%q]"\format package_name, already_loaded[content]
+                writer::writeln "package.preload[%q] = package.preload[%q]"::format package_name, already_loaded[content]
             else
-                writer\writeln "package.preload[%q] = function(...)"\format package_name
-                writer\endwrap ->
-                    if @options.compat_arg != false and content\match "%.%.%."
-                        writer\writeln "local arg = __luapack_arg__"
-                    writer\writelines content
+                writer::writeln "package.preload[%q] = function(...)"::format package_name
+                writer::endwrap ->
+                    if @options.compat_arg != false and content::match "%.%.%."
+                        writer::writeln "local arg = __luapack_arg__"
+                    writer::writelines content
                 already_loaded[content] = package_name
             if @options.clear_loaded != false
-                writer\writeln "package.loaded[%q] = nil"\format package_name
+                writer::writeln "package.loaded[%q] = nil"::format package_name
         
         if @loaded["__luapack_entry__"]?
             -- some C functions may return "fake" nil which behave differently
             -- returning it crashes some environments
             -- assigning it to a variable fixes the issue
             --  TODO: do we need the `do` block?
-            writer\writeln "do"
-            writer\endwrap ->
-                writer\writeln 'local _result = package.preload["__luapack_entry__"](...)'
-                writer\writeln "return _result"
-        writer\str!
+            writer::writeln "do"
+            writer::endwrap ->
+                writer::writeln 'local _result = package.preload["__luapack_entry__"](...)'
+                writer::writeln "return _result"
+        writer::str!
 
 -- cli
 cli = (arguments) ->
     options = {}
     for arg in *arguments
-        continue if "-" != arg\sub 1, 1
+        continue if "-" != arg::sub 1, 1
         switch arg
             when "-no-header" then options.with_header = false
             when "-yes-header" then options.with_header = true
@@ -233,16 +233,16 @@ cli = (arguments) ->
     print "Using luapack #{__version__}"
     print!
     for filename in *arguments
-        continue if "-" == filename\sub 1, 1
+        continue if "-" == filename::sub 1, 1
         print "Packing #{filename}"
         packer = Packer options
-        packed = packer\pack filename
-        outfile = filename\gsub "%.(%a+)$", (x) -> ".packed.lua"
+        packed = packer::pack filename
+        outfile = filename::gsub "%.(%a+)$", (x) -> ".packed.lua"
         print "Packed into #{outfile}"
         break if filename == outfile
         with io.open outfile, "w"
-            \write packed
-            \close!
+            ::write packed
+            ::close!
 
 
 check_cli = =>
