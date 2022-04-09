@@ -12,7 +12,7 @@ Head to [releases](https://github.com/Le0Developer/luapack/releases) and get the
 
 Install [yuescript](http://yuescript.org): `luarocks install yuescript`
 
-And then run `yue -e luapack.yue` followed by `lua luapack.lua luapack.lua`.
+And then run `yue -e luapack.yue luapack.yue`.
 
 You can use `luapack.packed.lua` afterwards.
 
