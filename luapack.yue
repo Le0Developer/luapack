@@ -222,13 +222,10 @@ cli = (arguments) ->
     options = {}
     for arg in *arguments
         continue if "-" != arg::sub 1, 1
-        switch arg
-            when "-no-header" then options.with_header = false
-            when "-yes-header" then options.with_header = true
-            when "-no-package-polyfill" then options.package_polyfill = false
-            when "-yes-package-polyfill" then options.package_polyfill = true
-            when "-no-minify" then options.minify = false
-            when "-yes-minify" then options.minify = true
+        operator, name = arg::match "^(%w+)-([%w-]+)$"
+        continue if operator != "yes" and operator != "no"
+        name = name::gsub "-", "_"
+        options[name] = operator == "yes"
 
     print "Using luapack #{__version__}"
     print!
