@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.4.0] - 2022-04-09
+## [0.4.1] - 2022-04-12
+
+### Updated
+
+- Fixed require pattern not working at all
+
+## [0.4.0] - 2022-04-09 [YANKED]
 
 ### Updated
 
@@ -79,7 +85,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial release
 
 
-[Unreleased]: https://github.com/le0developer/luapack/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/le0developer/luapack/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/le0developer/luapack/releases/tag/v0.4.1
 [0.4.0]: https://github.com/le0developer/luapack/releases/tag/v0.4.0
 [0.3.3]: https://github.com/le0developer/luapack/releases/tag/v0.3.3
 [0.3.2]: https://github.com/le0developer/luapack/releases/tag/v0.3.2
