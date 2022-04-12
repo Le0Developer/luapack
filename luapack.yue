@@ -154,7 +154,7 @@ export class Packer
 
         @loaded["__luapack_entry__"] = nil if @options.include_entry == false
 
-    @export: =>
+    export: =>
         packed = @bootstrap!
         packed = minifier.Rebuild.MinifyString packed if @options.minify != false and "table" == type minifier
         header = ""
