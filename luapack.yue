@@ -239,7 +239,16 @@ cli = (arguments) ->
         continue if "-" == filename::sub 1, 1
         print "Packing #{filename}"
         packer = Packer options
-        packer::pack filename
+
+        if options.standalone
+            local content
+            with io.open filename, "r"
+                content = ::read "*a"
+                ::close!
+            packer::include name for name in content::gmatch "[^\n]+"
+        else
+            packer::pack filename
+
         packed = packer::export!
         outfile = filename::gsub "%.(%a+)$", (x) -> ".packed.lua"
         print "Packed into #{outfile}"

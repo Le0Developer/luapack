@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added `include_entry` option
 - Added `packer:export()`
+- Added standalone option for CLI
+    - reads module names line for line and then includes them
 
 ### Changed
 
