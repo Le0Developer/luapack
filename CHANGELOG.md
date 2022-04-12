@@ -10,10 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added `include_entry` option
+- Added `packer:export()`
 
 ### Changed
 
 - Improved CLI option handler
+- `packer:pack()` no longer returns the full lua, use `packer:export()` to get it
 
 ## [0.4.1] - 2022-04-12
 

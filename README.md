@@ -31,8 +31,8 @@ local packer = luapack.Packer()
 -- or with options:
 -- local packer = luapack.Packer({minify = false})
 
-local packed = packer:pack("test.lua")
-print(packed)
+packer:pack("test.lua")
+print(packer:export())
 ```
 
 Make a new packer instance for each file you want to pack!
@@ -93,8 +93,8 @@ local packer = luapack.Packer()
 
 packer:include("dependency")
 
-local packed = packer:pack("test.lua")
-print(packed)
+packer:pack("test.lua")
+print(packed:export())
 ```
 
 Output:
@@ -121,8 +121,8 @@ end
 -- package_polyfill to create package and require
 local packer = luapack.Packer({package_polyfill = true})
 
-local packed = packer:pack("test.lua")
-print(packed)
+packer:pack("test.lua")
+print(packed:export())
 ```
 
 Or use the `-yes-package-polyfill` CLI option.
@@ -195,7 +195,9 @@ Includes the package and its dependencies.
 
 Includes the file as entry.
 
-Minifies and adds the luapack header.
+- **luapack:export()**
+
+Returns the bootstrapped lua code, with header and minification.
 
 - **luapack:bootstrap()**
 
@@ -256,8 +258,8 @@ luapack.helpers.fast_push(luapack.default_plugins, {
 })
 
 local packer = luapack.Packer()
-local packed = packer:pack("test.lua")
-print(packed)
+packer:pack("test.lua")
+print(packed:export())
 ```
 
 Output:
