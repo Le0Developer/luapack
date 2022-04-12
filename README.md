@@ -178,28 +178,28 @@ All options:
 - `include_entry = true` whether to include `__luapack_entry__` or not (useful for standalone packages)
 
 
-- **luapack:searchpath_compat(name)**
+- **Packer:searchpath_compat(name)**
 
 Uses `package.searchpath` (Lua 5.2+).
 If `package.searchpath` does not exist, a janky search using `io.open` is done as fallback. (for Lua 5.1 support)
 
-- **luapack:extract_packages(source)**
+- **Packer:extract_packages(source)**
 
 Extracts all `require` calls found in the source.
 
-- **luapack:include(package_name, filename=nil)**
+- **Packer:include(package_name, filename=nil)**
 
 Includes the package and its dependencies.
 
-- **luapack:pack(entry)**
+- **Packer:pack(entry)**
 
 Includes the file as entry.
 
-- **luapack:export()**
+- **Packer:export()**
 
 Returns the bootstrapped lua code, with header and minification.
 
-- **luapack:bootstrap()**
+- **Packer:bootstrap()**
 
 Generates the script and returns it.
 This **does not** minify it or add the luapack header.
