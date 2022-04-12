@@ -232,6 +232,8 @@ cli = (arguments) ->
         options[name] = operator == "yes"
 
     print "Using luapack #{__version__}"
+    option_str = table.concat ["#{key}=#{if value then "yes" else "no"}" for key, value in pairs options], ", "
+    print "Options: #{option_str}" if #option_str > 0
     print!
     for filename in *arguments
         continue if "-" == filename::sub 1, 1
