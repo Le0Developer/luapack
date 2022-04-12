@@ -109,6 +109,7 @@ if "table" == type moon
 --   clear_loaded = true
 --   plugins = default_plugins
 --   compat_arg = true
+--   include_entry = true
 export class Packer
     new: (@options = {}) =>
         @loaded = {}
@@ -150,6 +151,8 @@ export class Packer
     pack: (entry) =>
         @include "__luapack_entry__", entry
         error "file not found: #{entry}" unless @loaded["__luapack_entry__"]?
+
+        @loaded["__luapack_entry__"] = nil if @options.include_entry == false
 
         packed = @bootstrap!
         packed = minifier.Rebuild.MinifyString packed if @options.minify != false and "table" == type minifier

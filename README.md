@@ -175,6 +175,7 @@ All options:
 - `clear_loaded = true` clears `package.loaded` cache
 - `plugins = default_plugins` plugins
 - `compat_arg = true` compatibility for arg (cmd line arguments) passing in lua5.1 and 5.2
+- `include_entry = true` whether to include `__luapack_entry__` or not (useful for standalone packages)
 
 
 - **luapack:searchpath_compat(name)**
