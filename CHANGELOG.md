@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.4.2] - 2022-10-29
+
 ### Added
 
 - Added `include_entry` option
@@ -97,7 +99,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial release
 
 
-[Unreleased]: https://github.com/le0developer/luapack/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/le0developer/luapack/compare/v0.4.2...HEAD
+[0.4.2]: https://github.com/le0developer/luapack/releases/tag/v0.4.2
 [0.4.1]: https://github.com/le0developer/luapack/releases/tag/v0.4.1
 [0.4.0]: https://github.com/le0developer/luapack/releases/tag/v0.4.0
 [0.3.3]: https://github.com/le0developer/luapack/releases/tag/v0.3.3
