@@ -1,5 +1,5 @@
 
-require_pattern = [[require%s*%(?%s*(["'])([^%1]-)%1]]
+require_pattern = [[require%s*%(?%s*(["'])(.-)%1]]
 
 -- imports
 -- !!! using an extra function here, so the require call isn't interruped by a comma
@@ -66,7 +66,7 @@ export helpers = {
 export __author__ = "Leo Developer"
 export __url__ = "https://github.com/le0developer/luapack"
 export __license__ = "MIT"
-export __version__ = "0.4.2"
+export __version__ = "0.4.3"
 
 export default_plugins = {n: 0}
 

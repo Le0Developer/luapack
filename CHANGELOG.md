@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.4.3] - 2022-10-29
+
+### Fixed
+
+- Fixed lua pattern not working with 1s in the name.
+
 ## [v0.4.2] - 2022-10-29
 
 ### Added
@@ -99,7 +105,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial release
 
 
-[Unreleased]: https://github.com/le0developer/luapack/compare/v0.4.2...HEAD
+[Unreleased]: https://github.com/le0developer/luapack/compare/v0.4.3...HEAD
+[0.4.3]: https://github.com/le0developer/luapack/releases/tag/v0.4.3
 [0.4.2]: https://github.com/le0developer/luapack/releases/tag/v0.4.2
 [0.4.1]: https://github.com/le0developer/luapack/releases/tag/v0.4.1
 [0.4.0]: https://github.com/le0developer/luapack/releases/tag/v0.4.0
