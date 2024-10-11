@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `entry_name` config option (default: `__luapack_entry__`)
+- Added `package_preload_name` config option (default: `package.preload`)
+
 ### Fixed
 
 - Fixed `package.searchpath` not being used in Lua 5.2+ (instead falling back to our implementation)

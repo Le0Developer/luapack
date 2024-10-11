@@ -109,9 +109,14 @@ if "table" == type moon
 --   plugins = default_plugins
 --   compat_arg = true
 --   include_entry = true
+--   entry_name = "__luapack_entry__"
+--   package_preload_name = "package.preload"
 export class Packer
     new: (@options = {}) =>
         @loaded = {}
+
+    _entry_name: => @options.entry_name or "__luapack_entry__"
+    _package_preload_name: => @options.package_preload_name or "package.preload"
 
     extract_packages: (source) =>
         matches = {n: 0}
@@ -148,10 +153,10 @@ export class Packer
         @include dependency for dependency in *@extract_packages @loaded[package_name]
 
     pack: (entry) =>
-        @include "__luapack_entry__", entry
-        error "file not found: #{entry}" unless @loaded["__luapack_entry__"]?
+        @include @_entry_name!, entry
+        error "file not found: #{entry}" unless @loaded[@_entry_name!]?
 
-        @loaded["__luapack_entry__"] = nil if @options.include_entry == false
+        @loaded[@_entry_name!] = nil if @options.include_entry == false
 
     export: =>
         packed = @bootstrap!
@@ -198,9 +203,9 @@ export class Packer
         already_loaded = {}
         for package_name, content in pairs @loaded
             if already_loaded[content]
-                writer::writeln "package.preload[%q] = package.preload[%q]"::format package_name, already_loaded[content]
+                writer::writeln "%s[%q] = %s[%q]"::format @_package_preload_name!, package_name, @_package_preload_name!, already_loaded[content]
             else
-                writer::writeln "package.preload[%q] = function(...)"::format package_name
+                writer::writeln "%s[%q] = function(...)"::format @_package_preload_name, package_name
                 writer::endwrap ->
                     if @options.compat_arg != false and content::match "%.%.%."
                         writer::writeln "local arg = __luapack_arg__"
@@ -209,14 +214,14 @@ export class Packer
             if @options.clear_loaded != false
                 writer::writeln "package.loaded[%q] = nil"::format package_name
         
-        if @loaded["__luapack_entry__"]?
+        if @loaded[@_entry_name!]?
             -- some C functions may return "fake" nil which behave differently
             -- returning it crashes some environments
             -- assigning it to a variable fixes the issue
             --  TODO: do we need the `do` block?
             writer::writeln "do"
             writer::endwrap ->
-                writer::writeln 'local _result = package.preload["__luapack_entry__"](...)'
+                writer::writeln 'local _result = %s[%q](...)'::format @_package_preload_name, @_entry_name!
                 writer::writeln "return _result"
         writer::str!
 

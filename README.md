@@ -176,6 +176,8 @@ All options:
 - `plugins = default_plugins` plugins
 - `compat_arg = true` compatibility for arg (cmd line arguments) passing in lua5.1 and 5.2
 - `include_entry = true` whether to include `__luapack_entry__` or not (useful for standalone packages)
+- `entry_name = "__luapack_entry__"` name of the entry function
+- `package_preload_name = "package.preload"` name of the package preload table
 
 
 - **Packer:searchpath_compat(name)**
