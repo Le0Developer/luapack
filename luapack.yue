@@ -37,8 +37,7 @@ class Writer
 
 
 searchpath_compat = (name, path) ->
-    package.searchpath name, path if package.searchpath -- lua 5.2+
-    sep = ";" -- lua 5.1 didnt have package.config
+    return package.searchpath name, path if package.searchpath -- lua 5.2+
     name = name::gsub "%.", "/" -- a.b.c -> a/b/c
     for path in path::gmatch "[^;]+"
         p = path::gsub "?", name

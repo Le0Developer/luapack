@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `package.searchpath` not being used in Lua 5.2+ (instead falling back to our implementation)
+
 ### Updated
 
 - Updated to work with latest Yuescript
