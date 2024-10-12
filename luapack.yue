@@ -120,6 +120,7 @@ if "table" == type moon
 --   include_entry = true
 --   entry_name = "__luapack_entry__"
 --   package_preload_name = "package.preload"
+--   package_loaded_name = "package.loaded"
 --   alias = nil
 export class Packer
     new: (@options = {}) =>
@@ -128,6 +129,7 @@ export class Packer
 
     _entry_name: => @options.entry_name or "__luapack_entry__"
     _package_preload_name: => @options.package_preload_name or "package.preload"
+    _package_loaded_name: => @options.package_loaded_name or "package.loaded"
 
     extract_packages: (source) =>
         matches = {n: 0}
@@ -237,7 +239,7 @@ export class Packer
                     writer::writelines content
                 already_loaded[content] = package_name
             if @options.clear_loaded != false
-                writer::writeln "package.loaded[%q] = nil"::format name
+                writer::writeln "%s[%q] = nil"::format @_package_loaded_name!, name
         
         if @loaded[@_entry_name!]?
             -- some C functions may return "fake" nil which behave differently
