@@ -268,12 +268,19 @@ cli = (arguments) ->
     for arg in *arguments
         continue if "-" != arg::sub 1, 1
         operator, name = arg::match "^-(%w+)-([%w-]+)$"
-        continue if operator != "yes" and operator != "no"
-        name = name::gsub "-", "_"
-        options[name] = operator == "yes"
+        if operator?
+          error "invalid operator" if operator != "yes" and operator != "no"
+          name = name::gsub "-", "_"
+          options[name] = operator == "yes"
+          continue
+
+        name, value = arg::match "^-([%w-]+)=([%w-_.]+)$"
+        if name?
+          options[name::gsub "-", "_"] = value
+          continue
 
     print "Using luapack #{__version__}"
-    option_str = table.concat ["#{key}=#{if value then "yes" else "no"}" for key, value in pairs options], ", "
+    option_str = table.concat ["#{key}=#{if "string" == type value then value elseif value then "yes" else "no"}" for key, value in pairs options], ", "
     print "Options: #{option_str}" if #option_str > 0
     print!
 

@@ -13,14 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `package_preload_name` config option (default: `package.preload`)
 - Added `package_loaded_name` config option (default: `package.loaded`)
 - Added `alias` config option for renaming imported modules
-
-### Fixed
-
-- Fixed `package.searchpath` not being used in Lua 5.2+ (instead falling back to our implementation)
+- CLI now supports simple string arguments (`-name=value`)
 
 ### Updated
 
 - Updated to work with latest Yuescript
+
+### Fixed
+
+- Fixed `package.searchpath` not being used in Lua 5.2+ (instead falling back to our implementation)
 
 ## [v0.4.3] - 2022-10-29
 
