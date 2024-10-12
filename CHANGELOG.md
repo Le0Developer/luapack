@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed `package.searchpath` not being used in Lua 5.2+ (instead falling back to our implementation)
+- Fixed some minor LSP warnings
 
 ## [v0.4.3] - 2022-10-29
 
