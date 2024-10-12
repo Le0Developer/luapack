@@ -201,29 +201,39 @@ export class Packer
                     break
 
         if @options.package_polyfill
-            writer::writeln "if not package then _G.package = {preload = {}, loaded = {}} end"
-            writer::writeln "if not package.preload then package.preload = {} end"
-            writer::writeln "if not package.loaded then package.loaded = {} end"
+            duplicate_lines = {}
+            ensure_parent = =>
+              parents = @gmatch "[^%.]+"
+              growing = ""
+              for parent in parents
+                obj = growing .. parent
+                line = "if not %s then _G.%s = {} end"::format obj, obj
+                unless duplicate_lines[line]?
+                  writer::writeln line
+                  duplicate_lines[line] = true
+                growing ..= parent .. "."
+            ensure_parent @_package_preload_name!
+            ensure_parent @_package_loaded_name!
             writer::writeln "if not require then"
             writer::endwrap ->
                 writer::writeln "local sentinel = {}" -- recursion detection
                 writer::writeln "_G.require = function(modname)"
                 writer::endwrap ->
-                    writer::writeln "if package.loaded[modname] == sentinel then"
+                    writer::writeln "if %s[modname] == sentinel then"::format @_package_loaded_name!
                     writer::endwrap ->
                         writer::writeln 'error(("loop or previous error loading module %q"):format(modname), 0)'
-                    writer::writeln "if package.loaded[modname] ~= nil then return package.loaded[name] end"
-                    writer::writeln "if not package.preload[modname] then"
+                    writer::writeln "if %s[modname] ~= nil then return %s[modname] end"::format @_package_loaded_name!, @_package_loaded_name!
+                    writer::writeln "if not %s[modname] then"::format @_package_preload_name!
                     writer::endwrap ->
                         writer::writeln 'error(("module not found %q"):format(modname), 2)'
-                    writer::writeln "package.loaded[modname] = sentinel"
-                    writer::writeln 'local success, result = pcall(package.preload[modname], modname, ":preload:")'
+                    writer::writeln "%s[modname] = sentinel"::format @_package_loaded_name!
+                    writer::writeln 'local success, result = pcall(%s[modname], modname, ":preload:")'::format @_package_preload_name!
                     writer::writeln "if not success then"
                     writer::endwrap ->
-                        writer::writeln "package.loaded[modname] = nil" -- so it can be loaded again
+                        writer::writeln "%s[modname] = nil"::format @_package_loaded_name! -- so it can be loaded again
                         writer::writeln "error(result)" -- rethrow error
                     writer::writeln "if result == nil then result = true end"
-                    writer::writeln "package.loaded[modname] = result"
+                    writer::writeln "%s[modname] = result"::format @_package_loaded_name!
                     writer::writeln 'return result, ":preload:"'
 
         already_loaded = {}
