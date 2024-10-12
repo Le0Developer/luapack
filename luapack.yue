@@ -301,7 +301,7 @@ cli = (arguments) ->
             packer::pack filename
 
         packed = packer::export!
-        outfile = filename::gsub "%.(%a+)$", (x) -> ".packed.lua"
+        outfile = options.outfile or filename::gsub "%.(%a+)$", ".packed.lua"
         print "Packed into #{outfile}"
         break if filename == outfile
         with io.open outfile, "w"
