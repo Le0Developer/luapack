@@ -53,12 +53,21 @@ package_path_with_different_extension = => package.path::gsub "%.lua", ".#{@}"
 -- basically string:endswith
 check_file_extension = (filename, ext) -> ext == filename::sub -#ext
 replace_file_extension = (from_, to) => @gsub "%#{from_}$", to
+escape_string = => @gsub "([%%%^%$%(%)%.%[%]%*%+%-%?])", "%%%1"
+
+alias_factory = ->
+  n = 0
+  ->
+    n += 1
+    tostring n
 
 export helpers = {
     :fast_push
     :searchpath_compat
     :package_path_with_different_extension
     :check_file_extension
+    :escape_string
+    :alias_factory
 }
 -- version info
 
@@ -111,9 +120,11 @@ if "table" == type moon
 --   include_entry = true
 --   entry_name = "__luapack_entry__"
 --   package_preload_name = "package.preload"
+--   alias = nil
 export class Packer
     new: (@options = {}) =>
         @loaded = {}
+        @aliases = {}
 
     _entry_name: => @options.entry_name or "__luapack_entry__"
     _package_preload_name: => @options.package_preload_name or "package.preload"
@@ -122,6 +133,18 @@ export class Packer
         matches = {n: 0}
         fast_push matches, match for _, match in source::gmatch require_pattern
         matches
+
+    extract_and_alias_packages: (source) =>
+      packages = @extract_packages source
+      return packages, source unless @options.alias?
+
+      for package in *packages
+        @aliases[package] = @options.alias package unless @aliases[package]?
+        if @aliases[package]? -- alias function can return nil
+          pattern = [[(["'])(%s)%%1]]::format escape_string package
+          replace = [[%%1%s%%1]]::format escape_string @aliases[package]
+          source = source::gsub pattern, replace
+      packages, source
 
     include: (package_name, filename) =>
         plugins = @options.plugins or default_plugins
@@ -150,7 +173,8 @@ export class Packer
 
         return if "-- luapacked" == @loaded[package_name]::sub 1, 12 -- dont pack dependencies of a packed file
 
-        @include dependency for dependency in *@extract_packages @loaded[package_name]
+        packages, @loaded[package_name] = @extract_and_alias_packages @loaded[package_name]
+        @include dependency for dependency in *packages
 
     pack: (entry) =>
         @include @_entry_name!, entry
@@ -202,17 +226,18 @@ export class Packer
 
         already_loaded = {}
         for package_name, content in pairs @loaded
+            name = @aliases[package_name] or package_name
             if already_loaded[content]
-                writer::writeln "%s[%q] = %s[%q]"::format @_package_preload_name!, package_name, @_package_preload_name!, already_loaded[content]
+                writer::writeln "%s[%q] = %s[%q]"::format @_package_preload_name!, name, @_package_preload_name!, already_loaded[content]
             else
-                writer::writeln "%s[%q] = function(...)"::format @_package_preload_name, package_name
+                writer::writeln "%s[%q] = function(...)"::format @_package_preload_name!, name
                 writer::endwrap ->
                     if @options.compat_arg != false and content::match "%.%.%."
                         writer::writeln "local arg = __luapack_arg__"
                     writer::writelines content
                 already_loaded[content] = package_name
             if @options.clear_loaded != false
-                writer::writeln "package.loaded[%q] = nil"::format package_name
+                writer::writeln "package.loaded[%q] = nil"::format name
         
         if @loaded[@_entry_name!]?
             -- some C functions may return "fake" nil which behave differently
@@ -221,7 +246,7 @@ export class Packer
             --  TODO: do we need the `do` block?
             writer::writeln "do"
             writer::endwrap ->
-                writer::writeln 'local _result = %s[%q](...)'::format @_package_preload_name, @_entry_name!
+                writer::writeln 'local _result = %s[%q](...)'::format @_package_preload_name!, @_entry_name!
                 writer::writeln "return _result"
         writer::str!
 
@@ -239,6 +264,9 @@ cli = (arguments) ->
     option_str = table.concat ["#{key}=#{if value then "yes" else "no"}" for key, value in pairs options], ", "
     print "Options: #{option_str}" if #option_str > 0
     print!
+
+    options.alias = alias_factory! if options.alias == true
+
     for filename in *arguments
         continue if "-" == filename::sub 1, 1
         print "Packing #{filename}"

@@ -178,7 +178,9 @@ All options:
 - `include_entry = true` whether to include `__luapack_entry__` or not (useful for standalone packages)
 - `entry_name = "__luapack_entry__"` name of the entry function
 - `package_preload_name = "package.preload"` name of the package preload table
+- `alias = nil` a function that allows you to rename package names (experimental)
 
+Methods:
 
 - **Packer:searchpath_compat(name)**
 
